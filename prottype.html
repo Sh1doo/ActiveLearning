@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <script type="text/javascript">
+    var value1 = [];
+    let time1 = [];
+    var value2 = [];
+    let time2 = [];
+    let d = null;
+  </script>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <script src="program_1216.js"></script>
+<meta charset="UTF-8">
+<title>サンプル</title>
+<style type="text/css">
+  h1{
+    position: relative;
+    padding: 0.2em 0.5em;
+    background: -webkit-linear-gradient(to right, rgb(255, 124, 111), #ffc994);
+    background: linear-gradient(to right, rgb(255, 124, 111), #ffc994);
+    color: white;
+    font-weight: lighter;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.56);
+  }
+  h3 {
+    position: relative;
+  }
+
+h3:after {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 150px;
+  height: 5px;
+  content: '';
+  background-image: -webkit-gradient(linear, left top, right top, from(#fa709a), to(#fee140));
+  background-image: -webkit-linear-gradient(left, #fa709a 0%, #fee140 100%);
+  background-image: linear-gradient(to right, #fa709a 0%, #fee140 100%);
+}
+  input[type="number"]{
+    width: 40px; /*--幅--*/
+    font-size: 12px; /*--文字サイズ--*/
+    max-width: 100%;
+  }
+  .btn-gradient-radius {
+  display: inline-block;
+  padding: 5px 20px;
+
+  border-radius: 25px;
+    background: -webkit-linear-gradient(to right, rgb(255, 124, 111), #ffc994);
+    background: linear-gradient(to right, rgb(255, 124, 111), #ffc994);
+    color: white;
+    font-weight: lighter;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.56);
+}
+
+.btn-gradient-radius:hover {
+  background-image: linear-gradient(45deg, #FFC107 0%, #f76a35 100%);
+}
+
+  </style>
+</head>
+<body>
+
+<h1>最強最適化.com</h1>
+
+
+<h3>段取り</h3>
+<br>
+<button id="add">+</button>
+
+<form id="saiteki">
+<div id="target" style="padding: 10px; border: 1px dashed #00008b; border-radius: 10px; margin: 10px; background-color: #fde8ef;">
+    <div>
+      <label>工程名：<input type="text" class = "koutei1" size="10"></label>
+      <label>　　時間(m)：<input type="number" class = "tim1" size="5" min="1" step="1"></label>
+    </div>
+  </div>
+
+</form>
+<button id="sub1">-</button>
+
+  <br>
+  <br>
+  
+  <h3>チェーン通し</h3><br>
+  <button id="add2">+</button>
+
+  <form id="saiteki2">
+<div id="target2" style="padding: 10px; border: 1px dashed #00008b; border-radius: 10px; margin: 10px; background-color: #fde8ef;">
+    <div>
+      <label>工程名：<input type="text" class = "koutei2" size="10" ></label>
+      <label>　　時間(m)：<input type="number" class = "tim2" min="1" step="1" ></label>
+    </div>
+  </div>
+
+</form>
+<button id="sub2">-</button>
+
+  <br>
+  <br>
+  <label>人数：<input type="number" min="1" step="1" id="number"></label>
+
+
+  <br> <br> 
+  <a href="#" class="btn-gradient-radius" id="btn3" onclick="getValues();main();">実行！</a>
+
+  
+  <br>
+  <br>
+  結果
+  <br>
+  <output id="output1" for="実行結果"/>
+
+  <script>
+  </script>
+
+<script type="text/javascript">
+  function getValues() {
+    value1 = [];
+    time1 = [];
+    value2 = [];
+    time2 = [];
+      // 複数のinput要素を取得
+      var inputs = document.getElementsByClassName('koutei1');
+      // 各input要素から値を取得して配列に格納
+      for (var i = 0; i < inputs.length; i++) {
+        if(!(inputs[i].value == "")){
+          value1.push(inputs[i].value);
+        }        
+      }
+      
+
+      inputs = document.getElementsByClassName('tim1');
+      for (var i = 0; i < inputs.length; i++) {        
+        if(!(inputs[i].value == "")){
+          time1.push(parseInt(inputs[i].value,10));
+        }
+      }
+
+      inputs = document.getElementsByClassName('koutei2');
+      // 各input要素から値を取得して配列に格納
+      for (var i = 0; i < inputs.length; i++) {
+        if(!(inputs[i].value == "")){
+          value2.push(inputs[i].value);       
+        }
+      }
+
+      inputs = document.getElementsByClassName('tim2');
+      for (var i = 0; i < inputs.length; i++) {        
+        if(!(inputs[i].value == "")){
+          time2.push(parseInt(inputs[i].value,10));       
+        }
+      }
+
+      const element = document.getElementById("graph");
+
+      if(!(d == null)){
+        element.removeChild(d);
+      }
+      
+      d = document.createElementNS("http://www.w3.org/2000/svg","svg");
+
+      d.setAttribute('id','arrowDiagram');
+      d.setAttribute('width','5000');
+      d.setAttribute('height','1200');
+
+      element.appendChild(d);
+      
+
+      /*const element = document.getElementById("graph");
+
+      if(!(d == null)){
+        element.removeChild();
+      }
+      
+      d = document.createElement('svg');
+      d.setAttribute('id','arrowDiagram','width','5000','height','1200');
+      
+      //d.setAttribute('width','5000');
+      //d.setAttribute('height','1200');
+
+      <svg id="arrowDiagram" width="5000" height="1200"></svg>
+      
+      element.appendChild(d);
+      */
+      //<svg id="arrowDiagram" width="5000" height="1200">
+      
+    }
+    
+
+  // 要素をコピー＆追加する関数
+  function addExample() {
+      let elements = document.getElementById("target");
+      let copied = elements.lastElementChild.cloneNode(true);
+      elements.appendChild(copied);
+  }
+  
+  // ボタンにイベントハンドラをセット
+  const btn = document.getElementById("add");
+  btn.addEventListener("click", addExample, false);
+
+  function addExample2() {
+      let elements = document.getElementById("target2");
+      let copied = elements.lastElementChild.cloneNode(true);
+      elements.appendChild(copied);
+  }
+  
+  // ボタンにイベントハンドラをセット
+  const btn2 = document.getElementById("add2");
+  btn2.addEventListener("click", addExample2, false);
+  
+  
+  
+  function sub1Example() {
+      let element = document.getElementById("target");
+      let last = element.lastElementChild;
+      var count = element.childElementCount;
+      if(!(count == 1)){
+        element.removeChild(last);
+      }
+      
+  }
+  
+  // ボタンにイベントハンドラをセット
+  const btn3 = document.getElementById("sub1");
+  btn3.addEventListener("click", sub1Example, false);
+
+  function sub2Example() {
+      let element = document.getElementById("target2");
+      let last = element.lastElementChild;
+      var count = element.childElementCount;
+      if(!(count == 1)){
+        element.removeChild(last);
+      }
+      
+  }
+  
+  // ボタンにイベントハンドラをセット
+  const btn4 = document.getElementById("sub2");
+  btn4.addEventListener("click", sub2Example, false);
+</script>
+<div id="graph">
+  
+</div>
+</body>
+</html>
